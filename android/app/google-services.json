@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "94451775654",
+    "project_id": "deliveryosapp",
+    "storage_bucket": "deliveryosapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94451775654:android:4b347a6b3b5b806fe41c67",
+        "android_client_info": {
+          "package_name": "com.deliveryosapp.rider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOvSw3FGbVRkFZCHp-9YF6ja-TIyY_yWQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94451775654:android:8e571bb08ab0740fe41c67",
+        "android_client_info": {
+          "package_name": "com.deliveryosapp.riderpilot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOvSw3FGbVRkFZCHp-9YF6ja-TIyY_yWQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

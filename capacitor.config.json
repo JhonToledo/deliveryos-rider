@@ -1,0 +1,13 @@
+{
+  "appId": "com.deliveryosapp.rider",
+  "appName": "DeliveryOS Rider",
+  "webDir": "www",
+  "server": {
+    "url": "https://deliveryosapp.com/rider/login?bypass=plux2026test",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "useLegacyBridge": true
+  }
+}
