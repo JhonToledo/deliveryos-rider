@@ -9,6 +9,6 @@
   },
   "android": {
     "useLegacyBridge": true,
-    "appendUserAgent": "DeliveryOSRider/2"
+    "appendUserAgent": "DeliveryOSRider/3"
   }
 }
