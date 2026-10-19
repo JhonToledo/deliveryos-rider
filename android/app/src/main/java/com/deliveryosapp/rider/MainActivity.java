@@ -23,7 +23,7 @@ public class MainActivity extends BridgeActivity {
     // Debe coincidir con PUSH_CHANNEL_RIDER en app.py del servidor DeliveryOS.
     // Los canales de Android son inmutables: para cambiar sonido o vibracion hay que
     // crear un id nuevo (ofertas_v2, ...) y borrar el anterior.
-    private static final String OFFERS_CHANNEL = "ofertas_v1";
+    private static final String OFFERS_CHANNEL = "ofertas_v2";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,20 +38,22 @@ public class MainActivity extends BridgeActivity {
     private void createOffersChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
         NotificationManager nm = getSystemService(NotificationManager.class);
-        if (nm == null || nm.getNotificationChannel(OFFERS_CHANNEL) != null) return;
+        if (nm == null) return;
+        nm.deleteNotificationChannel("ofertas_v1");   // canal del build 2 (timbre generado)
+        if (nm.getNotificationChannel(OFFERS_CHANNEL) != null) return;
 
         NotificationChannel ch = new NotificationChannel(OFFERS_CHANNEL, "Ofertas de pedido",
                 NotificationManager.IMPORTANCE_HIGH);
         ch.setDescription("Pedidos disponibles para aceptar (60 s)");
-        Uri sound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "/raw/pedido");
+        Uri sound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "/raw/alerta_pedido");
         AudioAttributes attrs = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                 .build();
         ch.setSound(sound, attrs);
         ch.enableVibration(true);
-        // ~8 s de vibracion insistente, a la par del timbre pedido.wav
-        ch.setVibrationPattern(new long[]{0, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700, 300, 700});
+        // ~3 s de vibracion, a la par de la alerta alerta_pedido.mp3 (2,8 s)
+        ch.setVibrationPattern(new long[]{0, 600, 250, 600, 250, 600, 250, 600});
         ch.enableLights(true);
         ch.setLightColor(Color.parseColor("#FF6B00"));
         ch.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
