@@ -16,7 +16,6 @@ Shell de Capacitor que carga el sitio en vivo: `server.url` = `https://deliveryo
 - `appendUserAgent: DeliveryOSRider/<build>` (hoy 3) para que el dashboard distinga el APK; subirlo con `versionCode`/`versionName` (hoy 3 / 1.2 segun lo documentado en `deliveryos`).
 - El `?bypass=` evita el gate "Proximamente" (`COMING_SOON=1`); sin el, el rider nunca llega al login.
 - `node_modules/` e `.idea/` no se versionan.
-- **Ramas en GitHub (2026-10-27)**: el trabajo de las builds 2 y 3 (1.1 y 1.2) se subio a la rama `main`, mientras que la rama por defecto del repo es `master` (solo tenia el "primer commit"). `main` contiene a `master`, asi que `master` se puede adelantar sin conflicto. Usa UNA sola rama de aqui en adelante (`master`, la que ya usan admin y client) y no vuelvas a subir a `main`. Verificado contra el codigo: `versionCode 3` / `1.2`, `appendUserAgent: DeliveryOSRider/3`, canal `ofertas_v2`, permisos `VIBRATE` y `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, plugin `@capacitor/haptics`.
 
 ## Compilar (Windows, sin Android Studio)
 ```bash
