@@ -10,5 +10,9 @@
   "android": {
     "useLegacyBridge": true,
     "appendUserAgent": "DeliveryOSRider/3"
+  },
+  "ios": {
+    "contentInset": "never",
+    "appendUserAgent": "DeliveryOSRider/ios-1"
   }
 }

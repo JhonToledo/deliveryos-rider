@@ -1,0 +1,47 @@
+# Compilacion de la app iOS "DeliveryOS Rider" en Codemagic (Mac en la nube). PLANTILLA SIN PROBAR: se escribio en Windows y todavia no se ha corrido.
+#
+# Lo que hay que preparar UNA vez (lo hace el dueno, con su cuenta; ver "iOS" en CLAUDE.md):
+#   1. Cuenta de Apple Developer Program (99 USD al ano).
+#   2. En App Store Connect: crear la app con el bundle id com.deliveryosapp.rider y copiar su "Apple ID" numerico (pestana Informacion de la app).
+#   3. En App Store Connect > Usuarios y acceso > Integraciones: crear una clave de API (rol App Manager) y bajar el .p8.
+#   4. En Codemagic: Team settings > Integrations > App Store Connect: subir esa clave y ponerle el nombre que va en
+#      "integrations.app_store_connect" (abajo). Codemagic crea solo los certificados y perfiles de firma.
+#   5. Poner abajo el Apple ID numerico en APP_STORE_APPLE_ID.
+# Push: ver "iOS" en CLAUDE.md (llave APNs .p8 en Firebase, GoogleService-Info.plist y el paquete FirebaseMessaging).
+workflows:
+  ios-testflight:
+    name: DeliveryOS Rider - iOS (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: DeliveryOS_ASC
+    environment:
+      node: 22
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.deliveryosapp.rider
+      vars:
+        XCODE_PROJECT: ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+        APP_STORE_APPLE_ID: "PONER_EL_APPLE_ID_NUMERICO"
+    scripts:
+      - name: Instalar dependencias (Package.swift apunta a node_modules)
+        script: npm ci
+      - name: Sincronizar Capacitor con iOS
+        script: npx cap sync ios
+      - name: Aplicar los perfiles de firma
+        script: xcode-project use-profiles
+      - name: Compilar el IPA
+        script: |
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          BUILD_NUMBER=$(($LATEST + 1))
+          echo "Numero de compilacion: $BUILD_NUMBER"
+          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME" --archive-flags="CURRENT_PROJECT_VERSION=$BUILD_NUMBER"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
