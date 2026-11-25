@@ -1,2 +1,5 @@
 node_modules/
 .idea/
+# Llaves de firma: nunca van a git
+*.jks
+*.keystore

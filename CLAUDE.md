@@ -1,7 +1,7 @@
 # DeliveryOS Rider (app Android del repartidor)
 
 ## Que es
-Shell de Capacitor que carga el sitio en vivo: `server.url` = `https://deliveryosapp.com/rider/login?bypass=plux2026test` (`capacitor.config.json`), `android.useLegacyBridge: true`. Paquete `com.deliveryosapp.rider`, repo `github.com/JhonToledo/deliveryos-rider`.
+Shell de Capacitor que carga el sitio en vivo: `server.url` = `https://deliveryosapp.com/rider/login` (`capacitor.config.json`; sin `?bypass` desde el 2026-11-24), `android.useLegacyBridge: true`. Paquete `com.deliveryosapp.rider`, repo `github.com/JhonToledo/deliveryos-rider`.
 **Toda la UI y la logica viven en el backend** (repo `deliveryos`, `templates/rider/dashboard.html` y `app.py`). Cambios de HTML/CSS/JS/backend NO requieren recompilar; solo plugins, permisos, canales, iconos o `capacitor.config.json`. Lee primero el `CLAUDE.md` del repo `deliveryos` (reglas generales, dark mode, paleta, sin guion largo).
 
 ## Que aporta lo nativo (prioridad maxima de las 3 apps)
@@ -14,7 +14,7 @@ Shell de Capacitor que carga el sitio en vivo: `server.url` = `https://deliveryo
 - **Canales Android inmutables**: si cambia sonido o vibracion, id nuevo (`ofertas_v3`) en `MainActivity.java`, `PUSH_CHANNEL_RIDER` de `app.py` (repo deliveryos) y el borrado del canal viejo.
 - `res/raw`: minusculas, sin guiones, sin empezar por digito (`alerta_pedido.mp3` = `static/3_firma_doble.mp3` del servidor).
 - `appendUserAgent: DeliveryOSRider/<build>` (hoy 3) para que el dashboard distinga el APK; subirlo con `versionCode`/`versionName` (hoy 3 / 1.2 segun lo documentado en `deliveryos`).
-- El `?bypass=` evita el gate "Proximamente" (`COMING_SOON=1`); sin el, el rider nunca llega al login.
+- El `server.url` **ya no lleva `?bypass=`** (quitado el 2026-11-24, paso M15: la tienda esta abierta). Si algun dia se vuelve a cerrar con `COMING_SOON=1`, el rider no llegaria al login. No volver a meter la clave en una app que va a las tiendas.
 - `node_modules/` e `.idea/` no se versionan.
 
 ## Compilar (Windows, sin Android Studio)
@@ -25,6 +25,15 @@ npx cap sync android
 cd android && ./gradlew.bat assembleDebug --no-daemon     # APK en android/app/build/outputs/apk/debug/
 ```
 En un equipo nuevo falta `android/local.properties`: `sdk.dir=C:/Users/<usuario>/AppData/Local/Android/Sdk`. Entorno completo en el CLAUDE.md de `deliveryos`, seccion "Compilacion de las apps". Copia el APK a `deliveryos/apk/` (ignorada por git) para instalarlo. Firebase: `android/app/google-services.json` (proyecto "deliveryosapp").
+
+## Firma de lanzamiento para Google Play (paso M17, 2026-11-24)
+- Play pide un `.aab` firmado; un APK de depuracion no sirve. Con Play App Signing la llave nuestra es la **llave de subida** (la definitiva la guarda Google).
+- **Una sola llave para las tres apps**: `C:\Users\jairo\DeliveryOS-firma-android\deliveryos-subida.jks` (alias `upload`, RSA 4096, valida hasta 2054), FUERA de todo repositorio. La contraseña la eligio el dueño y no esta en ningun archivo: nunca pedirla en el chat ni pasarla escrita en un comando. Huella SHA-256 del certificado (publica): `4D:90:1C:FC:2F:58:7E:5D:E1:2E:7C:26:58:7D:4F:8A:CB:87:23:0C:14:A8:DE:36:B7:43:00:08:20:B0:B4:2C`.
+- `build.gradle` no tiene `signingConfig` a proposito: se compila sin firmar y firma `C:\Users\jairo\DeliveryOS-firma-android\firmar.ps1`, que ejecuta **el dueño** (pide la contraseña en su terminal y la borra al terminar). Al lado hay un `LEEME.txt`.
+- Version nueva: subir `versionCode` (Play no acepta dos veces el mismo) y `versionName` en `android/app/build.gradle` (y el numero de `appendUserAgent` si la app lo usa), `npx cap sync android`, `cd android && ./gradlew.bat clean bundleRelease --no-daemon`, y el dueño ejecuta `firmar.ps1`. El programa firma las TRES apps a la vez: las tres deben estar compiladas. Salen en `C:\Users\jairo\Documents\DeliveryOS-AAB\` junto con `verificacion-de-firma.txt`.
+- `clean` borra `android/app/build`: antes, copiar cualquier APK que se quiera conservar.
+- Primer paquete firmado (2026-11-24): `DeliveryOS-Repartidor-1.2-codigo3.aab`. Revisado por dentro: paquete, version, API 36, no es de depuracion, abre la direccion correcta sin `?bypass` y esta firmado con la llave nueva. **No probado en un telefono**. Subirlo a Play Console lo hace el dueño.
+- Un telefono con el APK de depuracion instalado debe **desinstalarlo** antes de instalar la app desde Play (la firma es distinta).
 
 ## Flujo de trabajo
 Documenta aqui todo cambio nativo. Commits en espanol, primera linea maximo 72 caracteres.
